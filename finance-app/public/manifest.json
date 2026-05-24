@@ -1,0 +1,24 @@
+{
+  "name": "FinanceMy",
+  "short_name": "FinanceMy",
+  "description": "Premium Personal Finance Manager",
+  "start_url": "/mobile/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "/codeguide-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/codeguide-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "orientation": "portrait",
+  "categories": ["finance", "productivity"]
+}

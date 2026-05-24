@@ -1,0 +1,27 @@
+{
+    "name": "telegram-bot",
+    "version": "1.0.0",
+    "description": "Telegram bot untuk pencatatan keuangan - terintegrasi dengan finance-app",
+    "private": true,
+    "scripts": {
+        "dev": "ts-node kode-telegram-bot.ts",
+        "start": "node dist/kode-telegram-bot.js",
+        "build": "tsc"
+    },
+    "keywords": [
+        "telegram",
+        "bot",
+        "finance"
+    ],
+    "author": "jefri",
+    "dependencies": {
+        "@types/node": "^25.3.5",
+        "@types/pg": "^8.18.0",
+        "dotenv": "^17.3.1",
+        "drizzle-orm": "^0.45.1",
+        "pg": "^8.20.0",
+        "telegraf": "^4.16.3",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.3"
+    }
+}
