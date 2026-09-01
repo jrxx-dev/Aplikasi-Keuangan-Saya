@@ -1,4 +1,0 @@
-{
-  "buildCommand": "cd finance-app && npm run build",
-  "outputDirectory": "finance-app/.next"
-}
