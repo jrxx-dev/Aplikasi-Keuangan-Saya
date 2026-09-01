@@ -14,7 +14,7 @@ import { useWidgetTheme } from "@/contexts/widget-theme-context";
 import { motion } from "framer-motion";
 
 export function WidgetThemeMenu() {
-    const { resetAllThemes } = useWidgetTheme();
+    const { resetAllThemes, activePreset, setActivePreset, themePresets } = useWidgetTheme();
 
     return (
         <DropdownMenu>
@@ -36,17 +36,27 @@ export function WidgetThemeMenu() {
                     >
                         <Palette className="w-4 h-4" />
                     </motion.div>
-                    <span className="hidden sm:inline">Tema Widget</span>
+                    <span className="hidden sm:inline">Tema</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-primary" />
-                    Kustomisasi Tema
+                    Pilih Tema
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                {Object.entries(themePresets).map(([key, preset]) => (
+                    <DropdownMenuItem
+                        key={key}
+                        onClick={() => setActivePreset(key)}
+                        className={`cursor-pointer ${activePreset === key ? "bg-primary/20" : ""}`}
+                    >
+                        <span className={activePreset === key ? "font-semibold" : ""}>{preset.label}</span>
+                    </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-sm text-muted-foreground cursor-default">
-                    Klik ikon <Palette className="w-3 h-3 mx-1 inline" /> pada setiap widget untuk mengubah warna
+                    Klik ikon <Palette className="w-3 h-3 mx-1 inline" /> pada setiap widget untuk ubah warna
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -54,7 +64,7 @@ export function WidgetThemeMenu() {
                     className="gap-2 text-destructive focus:text-destructive cursor-pointer"
                 >
                     <RotateCcw className="w-4 h-4" />
-                    Reset Semua Warna
+                    Reset Warna Tema
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

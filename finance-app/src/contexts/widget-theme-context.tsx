@@ -25,6 +25,12 @@ export interface WidgetTheme {
     gradient: string;
 }
 
+export interface ThemePreset {
+    name: string;
+    label: string;
+    themes: Record<WidgetId, WidgetTheme>;
+}
+
 export const defaultThemes: Record<WidgetId, WidgetTheme> = {
     "balance-card": {
         primary: "#3b82f6", // blue-600
@@ -113,21 +119,129 @@ export const defaultThemes: Record<WidgetId, WidgetTheme> = {
     },
 };
 
+export const themePresets: Record<string, ThemePreset> = {
+    "tema-1": {
+        name: "tema-1",
+        label: "Tema 1 - Classic",
+        themes: defaultThemes,
+    },
+    "tema-2": {
+        name: "tema-2",
+        label: "Tema 2 - Modern Finance",
+        themes: {
+            "balance-card": {
+                primary: "#f59e0b", // amber-500
+                secondary: "#fbbf24", // amber-400
+                accent: "#8b5cf6", // violet-500
+                gradient: "from-amber-400 to-violet-600",
+            },
+            "income-card": {
+                primary: "#10b981", // emerald-600
+                secondary: "#34d399", // emerald-400
+                accent: "#8b5cf6", // violet-500
+                gradient: "from-emerald-400 to-violet-600",
+            },
+            "expense-card": {
+                primary: "#f43f5e", // rose-600
+                secondary: "#fb7185", // rose-400
+                accent: "#8b5cf6", // violet-500
+                gradient: "from-rose-400 to-violet-600",
+            },
+            "budget-widget": {
+                primary: "#f59e0b", // amber-500
+                secondary: "#fbbf24", // amber-400
+                accent: "#8b5cf6", // violet-500
+                gradient: "from-amber-400 to-violet-600",
+            },
+            "goals-widget": {
+                primary: "#8b5cf6", // violet-500
+                secondary: "#a78bfa", // violet-400
+                accent: "#7c3aed", // violet-600
+                gradient: "from-violet-400 to-violet-600",
+            },
+            "paylater-widget": {
+                primary: "#f59e0b", // amber-500
+                secondary: "#fbbf24", // amber-400
+                accent: "#8b5cf6", // violet-500
+                gradient: "from-amber-400 to-violet-600",
+            },
+            "quick-actions": {
+                primary: "#8b5cf6", // violet-500
+                secondary: "#a78bfa", // violet-400
+                accent: "#7c3aed", // violet-600
+                gradient: "from-violet-600 to-violet-800",
+            },
+            "bank-accounts": {
+                primary: "#f59e0b", // amber-500
+                secondary: "#fbbf24", // amber-400
+                accent: "#8b5cf6", // violet-500
+                gradient: "from-amber-400 to-violet-600",
+            },
+            "e-wallets": {
+                primary: "#8b5cf6", // violet-500
+                secondary: "#a78bfa", // violet-400
+                accent: "#7c3aed", // violet-600
+                gradient: "from-violet-400 to-violet-600",
+            },
+            "cash-accounts": {
+                primary: "#10b981", // emerald-600
+                secondary: "#34d399", // emerald-400
+                accent: "#8b5cf6", // violet-500
+                gradient: "from-emerald-400 to-violet-600",
+            },
+            "average-income": {
+                primary: "#f59e0b", // amber-500
+                secondary: "#fbbf24", // amber-400
+                accent: "#8b5cf6", // violet-500
+                gradient: "from-amber-400 to-violet-600",
+            },
+            "average-expense": {
+                primary: "#f43f5e", // rose-600
+                secondary: "#fb7185", // rose-400
+                accent: "#8b5cf6", // violet-500
+                gradient: "from-rose-400 to-violet-600",
+            },
+            "average-widget": {
+                primary: "#8b5cf6", // violet-500
+                secondary: "#a78bfa", // violet-400
+                accent: "#7c3aed", // violet-600
+                gradient: "from-violet-400 to-violet-600",
+            },
+            "kasbon-widget": {
+                primary: "#f59e0b", // amber-500
+                secondary: "#fbbf24", // amber-400
+                accent: "#8b5cf6", // violet-500
+                gradient: "from-amber-400 to-violet-600",
+            },
+        },
+    },
+};
+
 interface WidgetThemeContextType {
     themes: Record<WidgetId, WidgetTheme>;
     updateTheme: (widgetId: WidgetId, theme: Partial<WidgetTheme>) => void;
     resetTheme: (widgetId: WidgetId) => void;
     resetAllThemes: () => void;
+    activePreset: string;
+    setActivePreset: (preset: string) => void;
+    themePresets: Record<string, ThemePreset>;
 }
 
 const WidgetThemeContext = createContext<WidgetThemeContextType | undefined>(undefined);
 
 export function WidgetThemeProvider({ children }: { children: ReactNode }) {
     const [themes, setThemes] = useState<Record<WidgetId, WidgetTheme>>(defaultThemes);
+    const [activePreset, setActivePresetState] = useState<string>("tema-1");
 
-    // Load themes from localStorage on mount
+    // Load themes and preset from localStorage on mount
     useEffect(() => {
         const savedThemes = localStorage.getItem("widget-themes");
+        const savedPreset = localStorage.getItem("widget-theme-preset");
+
+        if (savedPreset) {
+            setActivePresetState(savedPreset);
+        }
+
         if (savedThemes) {
             try {
                 const parsed = JSON.parse(savedThemes);
@@ -144,6 +258,11 @@ export function WidgetThemeProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("widget-themes", JSON.stringify(themes));
     }, [themes]);
 
+    // Save preset to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem("widget-theme-preset", activePreset);
+    }, [activePreset]);
+
     const updateTheme = (widgetId: WidgetId, themeUpdate: Partial<WidgetTheme>) => {
         setThemes((prev) => ({
             ...prev,
@@ -155,18 +274,30 @@ export function WidgetThemeProvider({ children }: { children: ReactNode }) {
     };
 
     const resetTheme = (widgetId: WidgetId) => {
+        const currentPreset = themePresets[activePreset];
+        const baseTheme = currentPreset ? currentPreset.themes[widgetId] : defaultThemes[widgetId];
         setThemes((prev) => ({
             ...prev,
-            [widgetId]: defaultThemes[widgetId],
+            [widgetId]: baseTheme,
         }));
     };
 
     const resetAllThemes = () => {
-        setThemes(defaultThemes);
+        const currentPreset = themePresets[activePreset];
+        const baseThemes = currentPreset ? currentPreset.themes : defaultThemes;
+        setThemes(baseThemes);
+    };
+
+    const setActivePreset = (preset: string) => {
+        setActivePresetState(preset);
+        const newPreset = themePresets[preset];
+        if (newPreset) {
+            setThemes(newPreset.themes);
+        }
     };
 
     return (
-        <WidgetThemeContext.Provider value={{ themes, updateTheme, resetTheme, resetAllThemes }}>
+        <WidgetThemeContext.Provider value={{ themes, updateTheme, resetTheme, resetAllThemes, activePreset, setActivePreset, themePresets }}>
             {children}
         </WidgetThemeContext.Provider>
     );
