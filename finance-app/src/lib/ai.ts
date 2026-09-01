@@ -14,7 +14,7 @@ export async function getAICompletion(prompt: string, context?: string) {
 
     try {
         const stream = await client.chat.send({
-            model: "xiaomi/mimo-v2-flash:free",
+            model: "google/gemma-4-26b-a4b-it:free",
             messages: [
                 {
                     role: "system",
@@ -44,7 +44,7 @@ export async function streamAIResponse(prompt: string, onChunk: (chunk: string) 
 
     try {
         const stream = await client.chat.send({
-            model: "xiaomi/mimo-v2-flash:free",
+            model: "google/gemma-4-26b-a4b-it:free",
             messages: [
                 {
                     role: "system",

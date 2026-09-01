@@ -59,7 +59,6 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(
                 className={cn("font-mono tracking-wider", className)}
                 autoComplete="off"
                 inputMode="numeric"
-                pattern="[0-9]*"
             />
         );
     }

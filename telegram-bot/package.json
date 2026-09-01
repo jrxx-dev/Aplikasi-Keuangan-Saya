@@ -6,7 +6,8 @@
     "scripts": {
         "dev": "ts-node kode-telegram-bot.ts",
         "start": "node dist/kode-telegram-bot.js",
-        "build": "tsc"
+        "build": "tsc",
+        "deploy": "node -e \"const fs = require('fs'); fs.copyFileSync('kode-telegram-bot.ts', 'supabase/functions/telegram-bot/index.ts');\" && npx supabase functions deploy telegram-bot --project-ref jayxdtaekqfxcsixqsba --no-verify-jwt"
     },
     "keywords": [
         "telegram",

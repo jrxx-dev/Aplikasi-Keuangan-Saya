@@ -101,7 +101,7 @@ export async function POST(req: Request) {
 
         try {
             const stream = await openrouter.chat.send({
-                model: "xiaomi/mimo-v2-flash:free",
+                model: "google/gemma-4-26b-a4b-it:free",
                 messages: formattedMessages,
                 stream: true,
                 streamOptions: {
