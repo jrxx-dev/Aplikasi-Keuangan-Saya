@@ -1,5 +1,9 @@
 {
-  "projectSettings": {
-    "rootDirectory": "finance-app"
-  }
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ]
 }
