@@ -38,7 +38,7 @@ export default async function Page() {
     budgetSummary,
     businessData
   ] = await Promise.all([
-    getFinancialSummary().catch(() => ({ balance: 0, income: 0, expense: 0 })),
+    getFinancialSummary().catch(() => ({ balance: 0, income: 0, expense: 0, incomeTrend: [], expenseTrend: [] })),
     getRecentTransactions().catch(() => []),
     getAccounts().catch(() => []),
     getCategoryBreakdown().catch(() => ({})),
