@@ -55,13 +55,19 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <div className="glass-bg" />
+
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <LanguageProvider>
+            <PWAManager />
+            <ThemeColorManager />
+            {children}
+            <BottomNav />
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>
