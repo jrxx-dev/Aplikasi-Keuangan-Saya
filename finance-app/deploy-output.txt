@@ -1,0 +1,144 @@
+<claude-code-hint v="1" type="plugin" value="vercel@claude-plugins-official" />
+Retrieving project…
+Your Project was either deleted, transferred to a new Team, or you don’t have access to it anymore.
+
+  Set up "E:\financemy\finance-app"
+Loading teams…
+Searching for existing projects…
+  Linked      jefri-afriansyah-maulanas-projects/finance-app
+Deploying jefri-afriansyah-maulanas-projects/finance-app
+Uploading [--------------------] (0.0B/5.8KB)
+Uploading [================----] (4.8KB/5.8KB)
+Uploading [================----] (4.9KB/5.8KB)
+Uploading [====================] (5.8KB/5.8KB)
+  Inspect     https://vercel.com/jefri-afriansyah-maulanas-projects/finance-app/Br9wNHA26cUY7QHdFPDRpjgwSPUS
+▲ Production  https://finance-ot354g5ol-jefri-afriansyah-maulanas-projects.vercel.app
+Building…
+Building…
+Running build in Washington, D.C., USA (East) – iad1
+Build machine configuration: 2 cores, 8 GB
+Retrieving list of deployment files...
+Previous build caches not available.
+Downloading 359 deployment files...
+Running "vercel build"
+Vercel CLI 59.3.0
+WARNING! Due to `builds` existing in your configuration file, the Build and Development Settings defined in your Project Settings will not apply. Learn More: https://vercel.link/unused-build-settings
+Installing dependencies...
+npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+added 701 packages in 23s
+262 packages are looking for funding
+run `npm fund` for details
+npm warn allow-scripts 5 packages have install scripts not yet covered by allowScripts:
+npm warn allow-scripts   esbuild@0.18.20 (postinstall: node install.js)
+npm warn allow-scripts   esbuild@0.25.12 (postinstall: node install.js)
+npm warn allow-scripts   sharp@0.34.5 (install: node install/check.js || npm run build)
+npm warn allow-scripts   esbuild@0.27.2 (postinstall: node install.js)
+npm warn allow-scripts   unrs-resolver@1.11.1 (postinstall: napi-postinstall unrs-resolver 1.11.1 check)
+npm warn allow-scripts
+npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
+Detected Next.js version: 16.1.1
+Running "npm run build"
+> codeguide-starter-fullstack@0.1.0 build
+> next build --turbopack
+⚠ Both `outputFileTracingRoot` and `turbopack.root` are set, but they must have the same value.
+Using `outputFileTracingRoot` value: /vercel/path1.
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+▲ Next.js 16.1.1 (Turbopack)
+- Environments: .env
+Creating an optimized production build ...
+⚠ Both `outputFileTracingRoot` and `turbopack.root` are set, but they must have the same value.
+Using `outputFileTracingRoot` value: /vercel/path1.
+✓ Compiled successfully in 55s
+Running TypeScript ...
+Collecting page data using 1 worker ...
+Generating static pages using 1 worker (0/35) ...
+Generating static pages using 1 worker (8/35)
+Generating static pages using 1 worker (17/35)
+Generating static pages using 1 worker (26/35)
+✓ Generating static pages using 1 worker (35/35) in 546.1ms
+Finalizing page optimization ...
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /accounts
+├ ƒ /analytics
+├ ƒ /api/auth/[...all]
+├ ƒ /api/budgets/summary
+├ ƒ /api/chat
+├ ƒ /api/log-error
+├ ƒ /api/paylater/summary
+├ ƒ /api/resolve-log
+├ ƒ /api/telegram
+├ ƒ /api/upload
+├ ƒ /api/user-settings/language
+├ ƒ /assets
+├ ƒ /budgets
+├ ƒ /business
+├ ƒ /business/akumulasi
+├ ƒ /business/customers
+├ ƒ /calendar
+├ ƒ /dashboard
+├ ƒ /debts
+├ ƒ /education
+├ ƒ /family
+├ ƒ /goals
+├ ƒ /help
+├ ƒ /insurance
+├ ƒ /investments
+├ ƒ /logs
+├ ƒ /mobile/dashboard
+├ ƒ /mobile/history
+├ ƒ /mobile/input
+├ ƒ /paylater
+├ ƒ /pension
+├ ƒ /planner
+├ ƒ /reports
+├ ƒ /savings
+├ ƒ /settings
+├ ○ /sign-in
+├ ○ /sign-up
+├ ƒ /subscriptions
+├ ƒ /tax
+├ ƒ /transactions
+├ ƒ /travel
+└ ƒ /zakat
+ƒ Proxy (Middleware)
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+Traced Next.js server files in: 66.339ms
+Created all serverless functions in: 521.853ms
+Collected static files (public/, static/, .next/static): 6.946ms
+Build Completed in /vercel/output [2m]
+Deploying outputs...
+Deployment completed
+Creating build cache...
+[2K[1A[2K[G▲ Production  https://finance-ot354g5ol-jefri-afriansyah-maulanas-projects.vercel.app
+Completing…
+▲ Aliased     https://finance-app-silk-five.vercel.app
+{
+  "status": "ok",
+  "deployment": {
+    "id": "dpl_Br9wNHA26cUY7QHdFPDRpjgwSPUS",
+    "url": "https://finance-ot354g5ol-jefri-afriansyah-maulanas-projects.vercel.app",
+    "inspectorUrl": "https://vercel.com/jefri-afriansyah-maulanas-projects/finance-app/Br9wNHA26cUY7QHdFPDRpjgwSPUS",
+    "readyState": "READY",
+    "target": "production",
+    "deploymentApiUrl": "https://api.vercel.com/v13/deployments/dpl_Br9wNHA26cUY7QHdFPDRpjgwSPUS"
+  },
+  "message": "Deployment finance-ot354g5ol-jefri-afriansyah-maulanas-projects.vercel.app ready.",
+  "next": [
+    {
+      "command": "vercel inspect finance-ot354g5ol-jefri-afriansyah-maulanas-projects.vercel.app",
+      "when": "Inspect deployment"
+    },
+    {
+      "command": "vercel deploy --prod",
+      "when": "Promote to production"
+    }
+  ]
+}
