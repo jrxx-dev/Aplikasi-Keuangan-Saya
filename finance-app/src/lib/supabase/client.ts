@@ -1,13 +1,13 @@
 import { createBrowserClient } from "@supabase/ssr";
 
-const customFetch = (url: string, options?: RequestInit) => {
+const customFetch = (input: string | URL | Request, options?: RequestInit): Promise<Response> => {
   if (options?.headers) {
     const headers = options.headers as Record<string, string>;
     Object.keys(headers).forEach(key => {
       headers[key] = headers[key].replace(/[^\x00-\x7F]/g, '');
     });
   }
-  return fetch(url, options);
+  return fetch(input, options);
 };
 
 export const createClient = () =>
