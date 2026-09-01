@@ -5,11 +5,5 @@
       "src": "finance-app/package.json",
       "use": "@vercel/next"
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "finance-app/$1"
-    }
   ]
 }
