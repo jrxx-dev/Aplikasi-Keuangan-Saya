@@ -44,19 +44,16 @@ export async function proxy(request: NextRequest) {
 
     // console.log(`[Proxy] User found: ${!!user}, Path: ${path}`);
 
-    const publicPaths = ["/", "/sign-in", "/sign-up", "/forgot-password"];
-
-    // Check if path is exactly in publicPaths logic or starts with allowed prefixes
-    const isPublicPath = publicPaths.includes(path) ||
-        path.startsWith("/auth/") ||
-        path.startsWith("/api/");
-
-    if (!user && !isPublicPath) {
-        // Redirect to sign-in if no user and path is protected
-        const url = request.nextUrl.clone();
-        url.pathname = "/sign-in";
-        return NextResponse.redirect(url);
-    }
+    // Auth check disabled for testing
+    // const publicPaths = ["/", "/sign-in", "/sign-up", "/forgot-password"];
+    // const isPublicPath = publicPaths.includes(path) ||
+    //     path.startsWith("/auth/") ||
+    //     path.startsWith("/api/");
+    // if (!user && !isPublicPath) {
+    //     const url = request.nextUrl.clone();
+    //     url.pathname = "/sign-in";
+    //     return NextResponse.redirect(url);
+    // }
 
     return response;
 }
