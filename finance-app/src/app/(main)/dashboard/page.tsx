@@ -41,11 +41,11 @@ export default async function Page() {
     getFinancialSummary().catch(() => ({ balance: 0, income: 0, expense: 0, incomeTrend: [], expenseTrend: [] })),
     getRecentTransactions().catch(() => []),
     getAccounts().catch(() => []),
-    getCategoryBreakdown().catch(() => ({})),
+    getCategoryBreakdown().catch(() => []),
     getLargestTransactions().catch(() => []),
     getDebts().catch(() => []),
     getGoals().catch(() => []),
-    getBudgetSummary().catch(() => ({})),
+    getBudgetSummary().catch(() => []),
     getBusinessData().catch(() => null)
   ]);
 
