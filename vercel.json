@@ -1,9 +1,9 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "finance-app/package.json",
-      "use": "@vercel/next"
-    }
-  ]
+  "buildCommand": "cd finance-app && npm run build",
+  "outputDirectory": "finance-app/.next",
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "@supabase_url",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@supabase_anon_key"
+  }
 }
