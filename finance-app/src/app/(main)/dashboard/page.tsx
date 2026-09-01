@@ -32,7 +32,7 @@ export default async function Page() {
     safeFetch(() => getLargestTransactions(), []),
     safeFetch(() => getDebts(), []),
     safeFetch(() => getGoals(), []),
-    safeFetch(() => getBudgetSummary(), []),
+    safeFetch(() => getBudgetSummary(), { totalBudget: 0, totalSpent: 0, percentage: 0, remaining: 0, status: 'ok' }),
     safeFetch(() => getBusinessData(), null)
   ]);
 
