@@ -147,13 +147,21 @@ export default function SignInPage() {
 
               <div className="space-y-4 pt-4">
                 <Button
-                  onClick={handleQuickAccess}
+                  type="button"
+                  onClick={() => {
+                    try {
+                      router.push("/dashboard");
+                    } catch (error) {
+                      console.error("Navigation error:", error);
+                    }
+                  }}
                   className="w-full h-12 text-base bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium rounded-xl shadow-lg shadow-indigo-500/20 transition-all hover:scale-[1.02]"
                 >
                   Lanjutkan ke Dashboard
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
                 <Button
+                  type="button"
                   variant="outline"
                   onClick={handleSwitchAccount}
                   disabled={isLoading}
