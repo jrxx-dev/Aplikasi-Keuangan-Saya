@@ -1,4 +1,15 @@
 {
   "version": 2,
-  "rootDirectory": "finance-app"
+  "builds": [
+    {
+      "src": "finance-app/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "finance-app/$1"
+    }
+  ]
 }
