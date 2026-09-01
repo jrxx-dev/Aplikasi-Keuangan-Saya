@@ -1,24 +1,11 @@
-import {
-  getFinancialSummary,
-  getRecentTransactions,
-  getAccounts,
-  getCategoryBreakdown,
-  getLargestTransactions,
-  getBudgetSummary
-} from "@/lib/actions/finance";
-import { getDebts } from "@/lib/actions/debts";
-import { getGoals } from "@/lib/actions/goals";
-import { getBusinessData } from "@/actions/business";
-import { DashboardWrapper } from "@/components/finance/dashboard-wrapper";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
-// Server Component Fetching
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function Page() {
-  // Check auth first
+  // Check auth
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -26,40 +13,16 @@ export default async function Page() {
     redirect("/sign-in");
   }
 
-  // Fetch all data with fallbacks
-  const [
-    summary,
-    recentTransactions,
-    accounts,
-    categoryBreakdown,
-    largestTransactions,
-    debts,
-    goals,
-    budgetSummary,
-    businessData
-  ] = await Promise.all([
-    getFinancialSummary().catch(() => ({ balance: 0, income: 0, expense: 0, incomeTrend: [], expenseTrend: [] })),
-    getRecentTransactions().catch(() => []),
-    getAccounts().catch(() => []),
-    getCategoryBreakdown().catch(() => []),
-    getLargestTransactions().catch(() => []),
-    getDebts().catch(() => []),
-    getGoals().catch(() => []),
-    getBudgetSummary().catch(() => []),
-    getBusinessData().catch(() => null)
-  ]);
-
-  const dashboardData = {
-    summary,
-    recentTransactions,
-    accounts,
-    categoryBreakdown,
-    largestTransactions,
-    debts,
-    goals,
-    budgetSummary,
-    businessDebts: businessData?.debts || []
-  };
-
-  return <DashboardWrapper data={dashboardData} />;
+  return (
+    <div className="p-8">
+      <div className="max-w-4xl">
+        <h1 className="text-4xl font-bold mb-4">Dashboard</h1>
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+          <p className="text-lg mb-2">Welcome, {user.email}!</p>
+          <p className="text-muted-foreground">Dashboard content loading...</p>
+          <p className="text-sm mt-4 text-muted-foreground">Authenticated as: {user.id}</p>
+        </div>
+      </div>
+    </div>
+  );
 }
