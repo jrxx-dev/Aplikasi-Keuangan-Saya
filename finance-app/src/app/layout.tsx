@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import { LanguageProvider } from "@/components/providers/language-provider";
 import "./globals.css";
 import { initConsoleCapture } from "@/lib/capture-console";
-import { BottomNav } from "@/components/mobile/bottom-nav";
 import { PWAManager } from "@/components/providers/pwa-manager";
 
 // Initialize console capture for logging terminal output
@@ -66,7 +65,6 @@ export default function RootLayout({
             <PWAManager />
             <ThemeColorManager />
             {children}
-            <BottomNav />
           </LanguageProvider>
         </ThemeProvider>
       </body>
