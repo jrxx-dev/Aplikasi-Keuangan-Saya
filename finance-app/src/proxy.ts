@@ -1,6 +1,16 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const customFetch = (input: string | URL | Request, options?: RequestInit): Promise<Response> => {
+  if (options?.headers) {
+    const headers = options.headers as Record<string, string>;
+    Object.keys(headers).forEach(key => {
+      headers[key] = headers[key].replace(/[^\x00-\x7F]/g, '');
+    });
+  }
+  return fetch(input, options);
+};
+
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
@@ -14,6 +24,7 @@ const supabase = createServerClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   {
+    global: { fetch: customFetch },
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -37,18 +48,7 @@ const supabase = createServerClient(
 
 const {
   data: { user },
-  error,
 } = await supabase.auth.getUser();
-
-console.log(
-  "[proxy]",
-  path,
-  "hasEnvUrl=" + !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-  "hasEnvKey=" + !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  "cookies=" + request.cookies.getAll().map((c) => c.name).join("|"),
-  "user=" + (user ? user.id : "null"),
-  "error=" + (error ? error.message + " status=" + error.status : "none")
-  );
 
 const publicPaths = ["/", "/sign-in", "/sign-up", "/forgot-password"];
 
