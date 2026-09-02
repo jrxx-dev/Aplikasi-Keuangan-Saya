@@ -38,10 +38,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+function AppSidebarBase({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession()
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar: originalToggleSidebar } = useSidebar()
   const { t } = useLanguage()
+
+  // Memoize the toggle handler
+  const handleToggleSidebar = useCallback(() => {
+    originalToggleSidebar()
+  }, [])
 
   // Dynamic navigation based on language
   const navGroups = [
@@ -138,7 +143,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-2 hover:bg-transparent data-[state=open]:hover:bg-transparent group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:!w-full group-data-[collapsible=icon]:!justify-center group-data-[collapsible=icon]:overflow-visible"
             >
               <button
-                onClick={toggleSidebar}
+                onClick={handleToggleSidebar}
                 className="flex items-center gap-3 w-full group cursor-pointer group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:overflow-visible"
               >
                 <motion.div
@@ -421,3 +426,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     </Sidebar >
   )
 }
+
+export const AppSidebar = React.memo(AppSidebarBase)

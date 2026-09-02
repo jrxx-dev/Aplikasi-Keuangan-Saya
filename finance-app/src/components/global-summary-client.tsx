@@ -1,10 +1,11 @@
 "use client";
 
+import * as React from "react";
 import { motion, AnimatePresence, animate } from "framer-motion";
 import { TrendingUp, TrendingDown, Gem, PiggyBank } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "@/lib/auth-client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -60,7 +61,7 @@ interface GlobalSummaryClientProps {
     transactions?: any[];
 }
 
-export default function GlobalSummaryClient({ summary, accounts = [], transactions = [] }: GlobalSummaryClientProps) {
+function GlobalSummaryClientBase({ summary, accounts = [], transactions = [] }: GlobalSummaryClientProps) {
     const { data: session } = useSession();
     const [mounted, setMounted] = useState(false);
     const { toggleSidebar } = useSidebar();
@@ -72,6 +73,27 @@ export default function GlobalSummaryClient({ summary, accounts = [], transactio
     const [openIncome, setOpenIncome] = useState(false);
     const [openExpense, setOpenExpense] = useState(false);
     const [openTransaction, setOpenTransaction] = useState(false);
+
+    // Memoize handlers
+    const handleToggleSidebar = useCallback(() => {
+        toggleSidebar();
+    }, [toggleSidebar]);
+
+    const handleOpenBalance = useCallback(() => {
+        setOpenBalance(true);
+    }, []);
+
+    const handleOpenIncome = useCallback(() => {
+        setOpenIncome(true);
+    }, []);
+
+    const handleOpenExpense = useCallback(() => {
+        setOpenExpense(true);
+    }, []);
+
+    const handleOpenTransaction = useCallback(() => {
+        setOpenTransaction(true);
+    }, []);
 
     useEffect(() => {
         setMounted(true);
@@ -136,7 +158,7 @@ export default function GlobalSummaryClient({ summary, accounts = [], transactio
 
                 {/* SECTION 1: PROFILE (LEFT) */}
                 <div className="flex-1 flex items-center gap-4 p-3 overflow-hidden">
-                    <div className="relative group cursor-pointer flex-shrink-0" onClick={toggleSidebar}>
+                    <div className="relative group cursor-pointer flex-shrink-0" onClick={handleToggleSidebar}>
                         <motion.div
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -187,7 +209,7 @@ export default function GlobalSummaryClient({ summary, accounts = [], transactio
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.2 }}
                             whileHover={{ backgroundColor: "rgba(209, 250, 229, 0.8)", flex: 1.3 }}
-                            onClick={() => setOpenIncome(true)}
+                            onClick={handleOpenIncome}
                             className="flex flex-col justify-center px-4 py-1.5 bg-emerald-50/40 dark:bg-emerald-900/10 min-w-[90px] cursor-pointer group overflow-hidden relative"
                         >
                             <div className="flex items-center gap-1.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-0.5 relative z-10">
@@ -208,7 +230,7 @@ export default function GlobalSummaryClient({ summary, accounts = [], transactio
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.3 }}
                             whileHover={{ backgroundColor: "rgba(255, 228, 230, 0.8)", flex: 1.3 }}
-                            onClick={() => setOpenExpense(true)}
+                            onClick={handleOpenExpense}
                             className="flex flex-col justify-center px-4 py-1.5 bg-rose-50/40 dark:bg-rose-900/10 min-w-[90px] cursor-pointer group overflow-hidden relative"
                         >
                             <div className="flex items-center gap-1.5 text-[9px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider mb-0.5 relative z-10">
@@ -235,7 +257,7 @@ export default function GlobalSummaryClient({ summary, accounts = [], transactio
                                 boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
                                 zIndex: 20
                             }}
-                            onClick={() => setOpenBalance(true)}
+                            onClick={handleOpenBalance}
                             className="flex flex-col justify-center px-5 py-1.5 bg-blue-50/40 dark:bg-blue-900/10 min-w-[110px] cursor-pointer group relative overflow-hidden"
                         >
                             {/* Constant Shimmer Effect */}
@@ -284,7 +306,7 @@ export default function GlobalSummaryClient({ summary, accounts = [], transactio
                     {/* Refined Premium Button */}
                     <div className="relative group ml-1">
                         <Button
-                            onClick={() => setOpenTransaction(true)}
+                            onClick={handleOpenTransaction}
                             className="relative overflow-hidden rounded-full h-9 pl-1.5 pr-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 border-y border-white/10 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                         >
                             {/* Glassy Sheen Overlay */}
@@ -385,3 +407,5 @@ export default function GlobalSummaryClient({ summary, accounts = [], transactio
         </motion.div>
     );
 }
+
+export default React.memo(GlobalSummaryClientBase);

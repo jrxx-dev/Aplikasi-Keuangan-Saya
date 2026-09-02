@@ -1,12 +1,13 @@
 "use client";
 
+import * as React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { useTransition } from "react";
+import { useTransition, useCallback } from "react";
 import { Loader2, Home, Plus, History, LayoutDashboard, ReceiptText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export function BottomNav() {
+function BottomNavBase() {
     const pathname = usePathname();
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
@@ -15,33 +16,33 @@ export function BottomNav() {
     if (!pathname.startsWith("/mobile")) return null;
 
     const navItems = [
-        { 
-            href: "/mobile/dashboard", 
-            label: "Beranda", 
-            icon: LayoutDashboard, 
-            activePaths: ["/mobile/dashboard"] 
+        {
+            href: "/mobile/dashboard",
+            label: "Beranda",
+            icon: LayoutDashboard,
+            activePaths: ["/mobile/dashboard"]
         },
-        { 
-            href: "/mobile/input", 
-            label: "Tambah", 
-            icon: Plus, 
-            isFAB: true, 
-            activePaths: ["/mobile/input"] 
+        {
+            href: "/mobile/input",
+            label: "Tambah",
+            icon: Plus,
+            isFAB: true,
+            activePaths: ["/mobile/input"]
         },
-        { 
-            href: "/mobile/history", 
-            label: "Riwayat", 
-            icon: ReceiptText, 
-            activePaths: ["/mobile/history"] 
+        {
+            href: "/mobile/history",
+            label: "Riwayat",
+            icon: ReceiptText,
+            activePaths: ["/mobile/history"]
         }
     ];
 
-    const handleNavigate = (href: string) => {
+    const handleNavigate = useCallback((href: string) => {
         if (pathname === href) return;
         startTransition(() => {
             router.push(href);
         });
-    };
+    }, [pathname, router]);
 
     return (
         <nav className="fixed bottom-0 left-0 right-0 z-[10000] px-6 pb-6 pointer-events-none">
@@ -139,3 +140,5 @@ export function BottomNav() {
         </nav>
     );
 }
+
+export const BottomNav = React.memo(BottomNavBase);
