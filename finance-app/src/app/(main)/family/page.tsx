@@ -5,6 +5,7 @@ import { Heart, Users, Home, PiggyBank, ShieldCheck } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
+
 export default function FamilyPage() {
     return (
         <div className="flex flex-col items-center justify-center min-h-[80vh] p-8 text-center relative overflow-hidden">
