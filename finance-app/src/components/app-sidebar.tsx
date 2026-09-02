@@ -176,6 +176,8 @@ function AppSidebarBase({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenuButton asChild tooltip="Dashboard" className="!p-0 h-auto hover:bg-transparent">
                 <Link
                   href="/dashboard"
+                  // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
+                  prefetch="intent"
                   className="relative flex items-center gap-4 w-full px-4 py-3.5 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white overflow-hidden group/dash shadow-md shadow-indigo-500/20 ring-1 ring-white/10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:min-w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:rounded-xl group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:aspect-square group-data-[collapsible=icon]:flex-none transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/dash:opacity-100 transition-opacity" />
@@ -203,6 +205,8 @@ function AppSidebarBase({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenuButton asChild tooltip="Analytics" className="!p-0 h-auto hover:bg-transparent">
                 <Link
                   href="/analytics"
+                  // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
+                  prefetch="intent"
                   className="relative flex items-center gap-4 w-full px-4 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white overflow-hidden group/dash shadow-md shadow-emerald-500/20 ring-1 ring-white/10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:min-w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:rounded-xl group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:aspect-square group-data-[collapsible=icon]:flex-none transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/dash:opacity-100 transition-opacity" />
@@ -230,6 +234,8 @@ function AppSidebarBase({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenuButton asChild tooltip="Transactions" className="!p-0 h-auto hover:bg-transparent">
                 <Link
                   href="/transactions"
+                  // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
+                  prefetch="intent"
                   className="relative flex items-center gap-4 w-full px-4 py-3.5 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-white overflow-hidden group/dash shadow-md shadow-sky-500/20 ring-1 ring-white/10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:min-w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:rounded-xl group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:aspect-square group-data-[collapsible=icon]:flex-none transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/dash:opacity-100 transition-opacity" />
@@ -287,7 +293,10 @@ function AppSidebarBase({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 {item.items.map((subItem: any) => (
                                   <SidebarMenuSubItem key={subItem.title}>
                                     <SidebarMenuSubButton asChild>
-                                      <Link href={subItem.url}>
+                                      <Link
+                                        href={subItem.url}
+                                        // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
+                                        prefetch="intent">
                                         <span>{subItem.title}</span>
                                       </Link>
                                     </SidebarMenuSubButton>
@@ -309,7 +318,11 @@ function AppSidebarBase({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       >
                         <SidebarMenuItem>
                           <SidebarMenuButton asChild tooltip={item.title}>
-                            <Link href={item.url!} className="group flex items-center gap-3 w-full group-data-[collapsible=icon]:justify-center">
+                            <Link
+                              href={item.url!}
+                              // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
+                              prefetch="intent"
+                              className="group flex items-center gap-3 w-full group-data-[collapsible=icon]:justify-center">
                               <motion.div
                                 whileHover={{ scale: 1.15, rotate: 5 }}
                                 transition={{ type: "spring" as const, stiffness: 400, damping: 10 }}
@@ -336,7 +349,11 @@ function AppSidebarBase({ ...props }: React.ComponentProps<typeof Sidebar>) {
               {navSecondary.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
-                    <Link href={item.url} className="group flex items-center gap-3 w-full group-data-[collapsible=icon]:justify-center">
+                    <Link
+                      href={item.url}
+                      // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
+                      prefetch="intent"
+                      className="group flex items-center gap-3 w-full group-data-[collapsible=icon]:justify-center">
                       <motion.div
                         whileHover={{ scale: 1.15, rotate: 5 }}
                         transition={{ type: "spring" as const, stiffness: 400, damping: 10 }}
@@ -367,6 +384,8 @@ function AppSidebarBase({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
                     <Link
                       href="/business"
+                      // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
+                      prefetch="intent"
                       className="flex flex-col gap-0.5 flex-1 select-none hover:opacity-80 transition-opacity group-data-[collapsible=icon]:hidden"
                     >
                       <span className="font-bold text-sm leading-none tracking-tight">Business</span>
@@ -378,7 +397,11 @@ function AppSidebarBase({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <SidebarMenuSub className="border-none px-4 pb-3 pt-0 m-0 gap-1 flex flex-col">
                       <SidebarMenuSubItem>
                         <SidebarMenuSubButton asChild className="text-white/80 hover:text-white hover:bg-white/10 active:bg-white/20 h-9 rounded-lg px-2">
-                          <Link href="/business/customers" className="flex items-center gap-3">
+                          <Link
+                            href="/business/customers"
+                            // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
+                            prefetch="intent"
+                            className="flex items-center gap-3">
                             <Users className="w-4 h-4" />
                             <span className="font-medium text-xs">Pelanggan</span>
                           </Link>
@@ -386,7 +409,11 @@ function AppSidebarBase({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       </SidebarMenuSubItem>
                       <SidebarMenuSubItem>
                         <SidebarMenuSubButton asChild className="text-white/80 hover:text-white hover:bg-white/10 active:bg-white/20 h-9 rounded-lg px-2">
-                          <Link href="/business/akumulasi" className="flex items-center gap-3">
+                          <Link
+                            href="/business/akumulasi"
+                            // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
+                            prefetch="intent"
+                            className="flex items-center gap-3">
                             <FileText className="w-4 h-4" />
                             <span className="font-medium text-xs">Akumulasi</span>
                           </Link>
@@ -394,7 +421,11 @@ function AppSidebarBase({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       </SidebarMenuSubItem>
                       <SidebarMenuSubItem>
                         <SidebarMenuSubButton asChild className="text-white/80 hover:text-white hover:bg-white/10 active:bg-white/20 h-9 rounded-lg px-2">
-                          <Link href="/business?view=settings" className="flex items-center gap-3">
+                          <Link
+                            href="/business?view=settings"
+                            // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
+                            prefetch="intent"
+                            className="flex items-center gap-3">
                             <Settings className="w-4 h-4" />
                             <span className="font-medium text-xs">Settings</span>
                           </Link>
@@ -402,7 +433,11 @@ function AppSidebarBase({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       </SidebarMenuSubItem>
                       <SidebarMenuSubItem>
                         <SidebarMenuSubButton asChild className="text-white/80 hover:text-white hover:bg-white/10 active:bg-white/20 h-9 rounded-lg px-2">
-                          <Link href="/business?view=info" className="flex items-center gap-3">
+                          <Link
+                            href="/business?view=info"
+                            // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
+                            prefetch="intent"
+                            className="flex items-center gap-3">
                             <Info className="w-4 h-4" />
                             <span className="font-medium text-xs">Informasi Bisnis</span>
                           </Link>
