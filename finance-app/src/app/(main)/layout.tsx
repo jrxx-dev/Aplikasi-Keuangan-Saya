@@ -13,8 +13,8 @@ import GlobalSummary from "@/components/global-summary"
 import { PageWrapper } from "@/components/page-wrapper"
 import { SummarySkeleton } from "@/components/skeletons/summary-skeleton"
 
-import { ChatWidget } from "@/components/finance/chat-widget"
 import { GlobalErrorLogger } from "@/components/global-error-logger"
+import { ChatWidgetLazy } from "@/components/chat-widget-lazy"
 
 export default async function DashboardLayout({
   children,
@@ -49,7 +49,7 @@ export default async function DashboardLayout({
                   <div className="flex flex-1 flex-col pt-4 min-h-0">{children}</div>
                 </PageWrapper>
               </WidgetThemeProvider>
-              <ChatWidget />
+              <ChatWidgetLazy />
             </div>
           </div>
         </div>

@@ -1,21 +1,32 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { FadeIn } from "@/components/ui/motion-wrapper";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AnalyticsChart } from "@/components/finance/analytics-chart";
+import { TableSkeleton } from "@/components/skeletons/table-skeleton";
 import { WealthSimulator } from "@/components/finance/wealth-simulator";
 import { NetWorthCard } from "@/components/finance/net-worth-card";
 import { SmartAdvisor } from "@/components/finance/smart-advisor";
 import { AIInsightsWidget } from "@/components/analytics/ai-insights-widget";
-import { AdvancedAnalytics } from "@/components/analytics/advanced-analytics";
 import { FinancialHealthScore } from "@/components/analytics/financial-health-score";
 import { SpendingHeatmap } from "@/components/analytics/spending-heatmap";
 import { GoalsTrackerWidget } from "@/components/analytics/goals-tracker-widget";
 import { SubscriptionTrackerWidget } from "@/components/analytics/subscription-tracker-widget";
 import { AchievementsWidget } from "@/components/analytics/achievements-widget";
 import { CategoryTrendWidget } from "@/components/analytics/category-trend-widget";
+
+// Dynamic imports for heavy chart components (deferred loading)
+const AnalyticsChart = dynamic(
+  () => import("@/components/finance/analytics-chart").then(mod => ({ default: mod.AnalyticsChart })),
+  { loading: () => <TableSkeleton />, ssr: true }
+);
+
+const AdvancedAnalytics = dynamic(
+  () => import("@/components/analytics/advanced-analytics").then(mod => ({ default: mod.AdvancedAnalytics })),
+  { loading: () => <TableSkeleton />, ssr: true }
+);
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
