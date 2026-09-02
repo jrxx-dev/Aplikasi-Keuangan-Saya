@@ -8,7 +8,6 @@ import { useEffect, useState, useRef } from "react";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { WidgetThemeMenu } from "@/components/finance/widget-theme-menu";
 import { useLanguage } from "@/components/providers/language-provider";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -316,7 +315,6 @@ export default function GlobalSummaryClient({ summary, accounts = [], transactio
                             <PiggyBank className="w-5 h-5" />
                         </Button>
                     </Link>
-                    <WidgetThemeMenu />
                     <ThemeToggle />
                 </div>
             </div>

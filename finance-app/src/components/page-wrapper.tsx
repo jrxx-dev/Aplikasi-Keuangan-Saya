@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
+import { WidgetThemeMenu } from "@/components/finance/widget-theme-menu";
 
 export function PageWrapper({ children }: { children: ReactNode }) {
     return (
@@ -48,6 +49,10 @@ export function PageWrapper({ children }: { children: ReactNode }) {
 
             {/* Content with subtle entrance animation */}
             <div className="relative">
+                {/* Floating Theme Menu */}
+                <div className="fixed top-4 right-4 z-50">
+                    <WidgetThemeMenu />
+                </div>
                 {children}
             </div>
         </motion.div>
