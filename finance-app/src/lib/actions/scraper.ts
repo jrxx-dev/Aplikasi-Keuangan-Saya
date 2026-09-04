@@ -1,23 +1,70 @@
 "use server";
 
 import * as cheerio from 'cheerio';
+import { isIP, BlockList } from 'node:net';
+import { lookup } from 'node:dns/promises';
 import { analyzeProductHTML } from '@/lib/ai';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+
+// SSRF guard: reject hosts that resolve to non-public address space.
+const privateRanges = new BlockList();
+privateRanges.addSubnet('10.0.0.0', 8, 'ipv4');
+privateRanges.addSubnet('172.16.0.0', 12, 'ipv4');
+privateRanges.addSubnet('192.168.0.0', 16, 'ipv4');
+privateRanges.addSubnet('127.0.0.0', 8, 'ipv4');
+privateRanges.addSubnet('169.254.0.0', 16, 'ipv4'); // link-local (cloud metadata)
+privateRanges.addSubnet('100.64.0.0', 10, 'ipv4'); // carrier-grade NAT
+privateRanges.addSubnet('0.0.0.0', 8, 'ipv4');
+privateRanges.addAddress('::1', 'ipv6');
+privateRanges.addSubnet('fc00::', 7, 'ipv6'); // unique local
+privateRanges.addSubnet('fe80::', 10, 'ipv6'); // link-local
+
+function isBlockedIp(ip: string): boolean {
+    const family = isIP(ip);
+    if (family === 0) return true;
+    return privateRanges.check(ip, family === 6 ? 'ipv6' : 'ipv4');
+}
+
+async function assertPublicUrl(raw: string): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
+    let parsed: URL;
+    try {
+        parsed = new URL(raw);
+    } catch {
+        return { ok: false, error: "Invalid URL" };
+    }
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        return { ok: false, error: "Only http/https URLs are allowed" };
+    }
+    const host = parsed.hostname.replace(/^\[|\]$/g, "");
+    if (isIP(host)) {
+        if (isBlockedIp(host)) return { ok: false, error: "URL points to a non-public address" };
+    } else {
+        if (host === "localhost" || host.endsWith(".localhost") || host.endsWith(".local") || host.endsWith(".internal")) {
+            return { ok: false, error: "URL points to a non-public address" };
+        }
+        try {
+            const results = await lookup(host, { all: true });
+            if (results.length === 0 || results.some((r) => isBlockedIp(r.address))) {
+                return { ok: false, error: "URL points to a non-public address" };
+            }
+        } catch {
+            return { ok: false, error: "Could not resolve host" };
+        }
+    }
+    return { ok: true, url: parsed.toString() };
+}
 
 export async function fetchLinkMetadata(url: string) {
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session?.user) return { error: "Unauthorized" };
+
         if (!url) return { error: "URL is empty" };
 
-        let targetUrl = url;
-        try {
-            const parsed = new URL(url);
-            // Cleanup common tracking params but keep essential ones
-            if (parsed.hostname.includes("google") || parsed.hostname.includes("facebook")) {
-                // strict cleaning for search engines
-            }
-            targetUrl = parsed.toString();
-        } catch {
-            return { error: "Invalid URL" };
-        }
+        const guard = await assertPublicUrl(url);
+        if (!guard.ok) return { error: guard.error };
+        const targetUrl = guard.url;
 
         console.log(`[Scraper] Executing Fetch (Mobile UA): ${targetUrl}`);
 
@@ -28,25 +75,48 @@ export async function fetchLinkMetadata(url: string) {
         let responseStatus = 0;
 
         try {
-            const response = await fetch(targetUrl, {
-                headers: {
-                    'User-Agent': UA,
-                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                    'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
-                    'Cache-Control': 'no-cache',
-                },
-                next: { revalidate: 0 }
-            });
+            // Follow redirects manually so every hop passes the SSRF guard.
+            let current = targetUrl;
+            let response: Response | null = null;
+            for (let hop = 0; hop < 5; hop++) {
+                const r = await fetch(current, {
+                    headers: {
+                        'User-Agent': UA,
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                        'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
+                        'Cache-Control': 'no-cache',
+                    },
+                    redirect: "manual",
+                    signal: AbortSignal.timeout(12000),
+                    next: { revalidate: 0 }
+                });
+                if (r.status >= 300 && r.status < 400 && r.headers.get("location")) {
+                    const next = new URL(r.headers.get("location")!, current).toString();
+                    const g = await assertPublicUrl(next);
+                    if (!g.ok) return { error: g.error };
+                    current = g.url;
+                    continue;
+                }
+                response = r;
+                break;
+            }
+            if (!response) return { error: "Too many redirects" };
 
             responseStatus = response.status;
             if (response.ok) {
-                html = await response.text();
+                const contentType = response.headers.get("content-type") || "";
+                if (contentType && !/(text\/html|application\/xhtml|text\/plain|application\/xml)/i.test(contentType)) {
+                    return { error: "Unsupported content type" };
+                }
+                // Cap body size (~3MB) to avoid memory abuse.
+                const buf = new Uint8Array(await response.arrayBuffer()).slice(0, 3 * 1024 * 1024);
+                html = new TextDecoder().decode(buf);
             } else {
                 console.warn(`[Scraper] HTTP Error: ${response.status}`);
             }
         } catch (e: any) {
             console.error("[Scraper] Fetch Failed:", e);
-            return { error: `Connection failed: ${e.message}` };
+            return { error: "Connection failed" };
         }
 
         if (!html) return { error: `Failed to load page (Status: ${responseStatus})` };
@@ -159,6 +229,6 @@ export async function fetchLinkMetadata(url: string) {
 
     } catch (error: any) {
         console.error("Scraper Critical Error:", error);
-        return { error: `Server error: ${error.message}` };
+        return { error: "Server error while reading the link" };
     }
 }

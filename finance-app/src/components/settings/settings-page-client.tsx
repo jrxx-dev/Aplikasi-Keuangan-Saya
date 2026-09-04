@@ -227,6 +227,16 @@ export function SettingsPageClient({ user, providers, telegramData }: SettingsPa
         }
     ];
 
+    // Admin-only sections. Server actions behind them already enforce superadmin;
+    // this just hides the UI for regular users.
+    const ADMIN_ONLY_TABS = new Set(["users", "system", "roles", "developer"]);
+    const isSuperAdmin = (user as any)?.role === "superadmin";
+    const menuGroups = isSuperAdmin
+        ? navItems
+        : navItems
+            .map((group) => ({ ...group, items: group.items.filter((it) => !ADMIN_ONLY_TABS.has(it.id)) }))
+            .filter((group) => group.items.length > 0);
+
     const [activeTab, setActiveTab] = useState("profile");
     const [mounted, setMounted] = useState(false);
 
@@ -458,7 +468,7 @@ export function SettingsPageClient({ user, providers, telegramData }: SettingsPa
                 {/* --- SIDEBAR (Independent Scroll) --- */}
                 <aside className="col-span-12 md:col-span-3 lg:col-span-3 border-r border-slate-200/50 dark:border-white/10 bg-white/40 dark:bg-black/20 h-full overflow-y-auto custom-scrollbar">
                     <div className="p-6 space-y-8">
-                        {navItems.map((group) => (
+                        {menuGroups.map((group) => (
                             <div key={group.category} className="space-y-3">
                                 <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2">
                                     {group.category}

@@ -11,10 +11,10 @@ export async function POST(request: NextRequest) {
             headers: await headers()
         });
 
-        if (!session?.user) {
+        if (!session?.user || session.user.role !== "superadmin") {
             return NextResponse.json(
                 { success: false, message: "Unauthorized" },
-                { status: 401 }
+                { status: 403 }
             );
         }
 
