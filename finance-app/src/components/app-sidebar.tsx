@@ -7,7 +7,7 @@ import { useSession } from "@/lib/auth-client"
 import {
   Gem, LayoutDashboard, TrendingUp, FileText, Target, PiggyBank, ArrowLeftRight, Settings, HelpCircle,
   Bug, CalendarClock, Home, ChevronRight, Coins, CalendarRange, LineChart, Users, GraduationCap, Landmark, Heart,
-  Receipt, Umbrella, Map, Plane, ShieldCheck, Sparkles, Briefcase, MoreHorizontal, Info, ChevronDown, ShoppingBag, Plus
+  Receipt, Umbrella, Map, Plane, ShieldCheck, Sparkles, MoreHorizontal, ChevronDown, ShoppingBag, Plus
 } from "lucide-react"
 import { motion } from "framer-motion"
 
@@ -369,90 +369,6 @@ function AppSidebarBase({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Business Management Button (Bottom) */}
-        <SidebarGroup className="mt-2 pb-2">
-          <SidebarMenu>
-            <Collapsible asChild className="group/collapsible">
-              <SidebarMenuItem>
-                <div className="w-full rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white overflow-hidden shadow-md shadow-blue-500/20 ring-1 ring-white/10 transition-all duration-300 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:rounded-xl group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:bg-none group-data-[collapsible=icon]:ring-0 group-data-[collapsible=icon]:shadow-none">
-                  <div className="flex items-center gap-4 px-4 py-3.5 w-full relative z-20 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center">
-                    <CollapsibleTrigger asChild>
-                      <div className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md shrink-0 border border-white/10 shadow-sm cursor-pointer hover:bg-white/30 hover:scale-105 transition-all active:scale-95 group-data-[state=open]/collapsible:bg-white/40 group-data-[state=open]/collapsible:shadow-inner group-data-[state=open]/collapsible:ring-1 group-data-[state=open]/collapsible:ring-white/30 group-data-[collapsible=icon]:bg-blue-600 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:border-none">
-                        <Briefcase className="w-5 h-5 transition-transform duration-300 group-data-[state=open]/collapsible:scale-90 text-white" />
-                      </div>
-                    </CollapsibleTrigger>
-
-                    <Link
-                      href="/business"
-                      // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
-                      prefetch="intent"
-                      className="flex flex-col gap-0.5 flex-1 select-none hover:opacity-80 transition-opacity group-data-[collapsible=icon]:hidden"
-                    >
-                      <span className="font-bold text-sm leading-none tracking-tight">Business</span>
-                      <span className="text-[11px] text-white/80 leading-none font-medium text-left">Income & Ventures</span>
-                    </Link>
-                  </div>
-
-                  <CollapsibleContent className="group-data-[collapsible=icon]:hidden">
-                    <SidebarMenuSub className="border-none px-4 pb-3 pt-0 m-0 gap-1 flex flex-col">
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton asChild className="text-white/80 hover:text-white hover:bg-white/10 active:bg-white/20 h-9 rounded-lg px-2">
-                          <Link
-                            href="/business/customers"
-                            // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
-                            prefetch="intent"
-                            className="flex items-center gap-3">
-                            <Users className="w-4 h-4" />
-                            <span className="font-medium text-xs">Pelanggan</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton asChild className="text-white/80 hover:text-white hover:bg-white/10 active:bg-white/20 h-9 rounded-lg px-2">
-                          <Link
-                            href="/business/akumulasi"
-                            // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
-                            prefetch="intent"
-                            className="flex items-center gap-3">
-                            <FileText className="w-4 h-4" />
-                            <span className="font-medium text-xs">Akumulasi</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton asChild className="text-white/80 hover:text-white hover:bg-white/10 active:bg-white/20 h-9 rounded-lg px-2">
-                          <Link
-                            href="/business?view=settings"
-                            // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
-                            prefetch="intent"
-                            className="flex items-center gap-3">
-                            <Settings className="w-4 h-4" />
-                            <span className="font-medium text-xs">Settings</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton asChild className="text-white/80 hover:text-white hover:bg-white/10 active:bg-white/20 h-9 rounded-lg px-2">
-                          <Link
-                            href="/business?view=info"
-                            // @ts-ignore - prefetch="intent" is supported by Next.js at runtime
-                            prefetch="intent"
-                            className="flex items-center gap-3">
-                            <Info className="w-4 h-4" />
-                            <span className="font-medium text-xs">Informasi Bisnis</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-
-                  {/* Decorative faint glow for the whole box - hidden in collapsed */}
-                  <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-white/10 blur-2xl rounded-full pointer-events-none group-data-[collapsible=icon]:hidden" />
-                </div>
-              </SidebarMenuItem>
-            </Collapsible>
-          </SidebarMenu>
-        </SidebarGroup>
       </SidebarContent >
 
       <SidebarFooter>

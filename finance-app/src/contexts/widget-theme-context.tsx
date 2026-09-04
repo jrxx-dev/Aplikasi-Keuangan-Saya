@@ -15,8 +15,7 @@ export type WidgetId =
     | "cash-accounts"
     | "average-income"
     | "average-expense"
-    | "average-widget"
-    | "kasbon-widget";
+    | "average-widget";
 
 export interface WidgetTheme {
     primary: string;
@@ -111,12 +110,6 @@ export const defaultThemes: Record<WidgetId, WidgetTheme> = {
         accent: "#4f46e5", // indigo-600
         gradient: "from-indigo-400 to-indigo-600",
     },
-    "kasbon-widget": {
-        primary: "#3b82f6", // blue-600
-        secondary: "#60a5fa", // blue-400
-        accent: "#1d4ed8", // blue-700
-        gradient: "from-blue-400 to-blue-600",
-    },
 };
 
 export const themePresets: Record<string, ThemePreset> = {
@@ -206,12 +199,6 @@ export const themePresets: Record<string, ThemePreset> = {
                 secondary: "#a78bfa", // violet-400
                 accent: "#7c3aed", // violet-600
                 gradient: "from-violet-400 to-violet-600",
-            },
-            "kasbon-widget": {
-                primary: "#f59e0b", // amber-500
-                secondary: "#fbbf24", // amber-400
-                accent: "#8b5cf6", // violet-500
-                gradient: "from-amber-400 to-violet-600",
             },
         },
     },

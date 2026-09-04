@@ -22,7 +22,6 @@ import { BudgetRadar } from "@/components/finance/budget-radar";
 import { SpendingComparisonWidget } from "@/components/finance/spending-comparison";
 import { FinancialForecastWidget } from "@/components/finance/financial-forecast";
 import { PaylaterWidget } from "@/components/finance/paylater-widget";
-import { KasbonWidget } from "@/components/business/kasbon-widget";
 import { Button } from "@/components/ui/button";
 
 interface DashboardData {
@@ -44,7 +43,6 @@ interface DashboardData {
     categoryBreakdown: any[];
     largestTransactions: any[];
     debts: any[];
-    businessDebts: any[];
     goals: any[];
     budgetSummary: any;
 }
@@ -907,9 +905,6 @@ export function DashboardWrapper({ data }: { data: DashboardData }) {
                         </motion.div>
                         <motion.div variants={itemVariants} className="col-span-1">
                             <PaylaterWidget data={data.debts} />
-                        </motion.div>
-                        <motion.div variants={itemVariants} className="col-span-1">
-                            <KasbonWidget data={data.businessDebts} />
                         </motion.div>
 
                     </motion.div>

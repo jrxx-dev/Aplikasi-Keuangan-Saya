@@ -8,7 +8,6 @@ import {
 } from "@/lib/actions/finance";
 import { getDebts } from "@/lib/actions/debts";
 import { getGoals } from "@/lib/actions/goals";
-import { getBusinessData } from "@/actions/business";
 import { DashboardWrapper } from "@/components/finance/dashboard-wrapper";
 
 export const dynamic = "force-dynamic";
@@ -24,7 +23,7 @@ async function safeFetch<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
 }
 
 export default async function Page() {
-  const [summary, recentTransactions, accounts, categoryBreakdown, largestTransactions, debts, goals, budgetSummary, businessData] = await Promise.all([
+  const [summary, recentTransactions, accounts, categoryBreakdown, largestTransactions, debts, goals, budgetSummary] = await Promise.all([
     safeFetch(() => getFinancialSummary(), { balance: 0, income: 0, expense: 0, incomeTrend: [], expenseTrend: [] }),
     safeFetch(() => getRecentTransactions(), []),
     safeFetch(() => getAccounts(), []),
@@ -32,8 +31,7 @@ export default async function Page() {
     safeFetch(() => getLargestTransactions(), []),
     safeFetch(() => getDebts(), []),
     safeFetch(() => getGoals(), []),
-    safeFetch(() => getBudgetSummary(), { totalBudget: 0, totalSpent: 0, percentage: 0, remaining: 0, status: 'ok' }),
-    safeFetch(() => getBusinessData(), null)
+    safeFetch(() => getBudgetSummary(), { totalBudget: 0, totalSpent: 0, percentage: 0, remaining: 0, status: 'ok' })
   ]);
 
   const dashboardData = {
@@ -44,8 +42,7 @@ export default async function Page() {
     largestTransactions,
     debts,
     goals,
-    budgetSummary,
-    businessDebts: businessData?.debts || []
+    budgetSummary
   };
 
   return <DashboardWrapper data={dashboardData} />;
