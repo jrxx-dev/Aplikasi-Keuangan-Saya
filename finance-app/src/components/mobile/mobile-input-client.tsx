@@ -13,7 +13,6 @@ import {
     Loader2
 } from "lucide-react";
 import { createTransaction } from "@/lib/actions/finance";
-import { saveDebt } from "@/actions/business";
 import { MoneyInput } from "@/components/ui/money-input";
 import { formatCurrency, cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -27,11 +26,9 @@ interface MobileInputClientProps {
 
 export function MobileInputClient({ accounts, categories, recentTransactions }: MobileInputClientProps) {
     const router = useRouter();
-    const [type, setType] = useState<"expense" | "income" | "kasbon">("expense");
+    const [type, setType] = useState<"expense" | "income">("expense");
     const [amount, setAmount] = useState("");
     const [description, setDescription] = useState("");
-    const [debtorName, setDebtorName] = useState("");
-    const [kasbonCategory, setKasbonCategory] = useState<"kuota" | "voucher" | "other">("kuota");
     const [accountId, setAccountId] = useState(accounts[0]?.id || "");
     const [categoryId, setCategoryId] = useState("");
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -46,58 +43,33 @@ export function MobileInputClient({ accounts, categories, recentTransactions }: 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        if (type === "kasbon") {
-            if (!amount || !debtorName) {
-                toast.error("Lengkapi nama dan nominal");
-                return;
-            }
-        } else {
-            if (!amount || !accountId || !categoryId) {
-                toast.error("Lengkapi data yang wajib");
-                return;
-            }
+        if (!amount || !accountId || !categoryId) {
+            toast.error("Lengkapi data yang wajib");
+            return;
         }
 
         setIsLoading(true);
         try {
             const cleanAmount = amount.replace(/\D/g, "");
-            
-            if (type === "kasbon") {
-                await saveDebt({
-                    id: crypto.randomUUID(),
-                    userId: "", // Handled by action
-                    name: debtorName,
-                    amount: cleanAmount,
-                    description: description || `Kasbon ${kasbonCategory.toUpperCase()}`,
-                    category: kasbonCategory,
-                    type: "receivable",
-                    status: "unpaid",
-                    dueDate: new Date(date),
-                });
-                
-                toast.success("Kasbon dicatat!", {
-                    icon: <CheckCircle2 className="w-5 h-5 text-blue-500" />
+
+            const res = await createTransaction({
+                amount: cleanAmount,
+                description,
+                accountId,
+                categoryId,
+                type,
+                date: new Date(date),
+                source: "mobile"
+            });
+
+            if (res.success) {
+                toast.success("Catatan disimpan!", {
+                    icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                 });
             } else {
-                const res = await createTransaction({
-                    amount: cleanAmount,
-                    description,
-                    accountId,
-                    categoryId,
-                    type,
-                    date: new Date(date),
-                    source: "mobile"
-                });
-
-                if (res.success) {
-                    toast.success("Catatan disimpan!", {
-                        icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                    });
-                } else {
-                    throw new Error("Gagal menyimpan");
-                }
+                throw new Error("Gagal menyimpan");
             }
-            
+
             router.push("/mobile/dashboard");
             router.refresh();
         } catch (error) {
@@ -118,7 +90,7 @@ export function MobileInputClient({ accounts, categories, recentTransactions }: 
             {/* Amount Input Area (Glassmorphism focus) */}
             <section className="glass-card rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 shadow-sm border border-primary/10">
                 <Label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">
-                    {type === "kasbon" ? "Nominal Kasbon" : "Nominal Transaksi"}
+                    Nominal Transaksi
                 </Label>
                 <div className="flex items-center text-primary relative">
                     <span className="text-3xl font-black mr-2 opacity-50 transition-transform duration-300 transform origin-right">Rp</span>
@@ -132,9 +104,9 @@ export function MobileInputClient({ accounts, categories, recentTransactions }: 
                 </div>
             </section>
 
-            {/* Transaction Type Selector - UPDATED TO 3 COLUMNS */}
-            <section className="grid grid-cols-3 gap-2">
-                <motion.div 
+            {/* Transaction Type Selector */}
+            <section className="grid grid-cols-2 gap-2">
+                <motion.div
                     whileTap={{ scale: 0.95 }}
                     className={`flex flex-col items-center justify-center py-4 px-2 rounded-2xl border-2 transition-all duration-300 cursor-pointer ${type === 'income' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600 shadow-lg' : 'bg-surface-container-lowest dark:bg-slate-800 border-outline-variant/30 text-on-surface-variant opacity-60'}`}
                     onClick={() => setType('income')}
@@ -142,7 +114,7 @@ export function MobileInputClient({ accounts, categories, recentTransactions }: 
                     <span className="material-symbols-outlined mb-1 text-2xl" style={{ fontVariationSettings: type === 'income' ? "'FILL' 1, 'wght' 600" : "'FILL' 0, 'wght' 400" }}>download</span>
                     <span className="text-[10px] font-bold uppercase tracking-tighter">Masuk</span>
                 </motion.div>
-                <motion.div 
+                <motion.div
                     whileTap={{ scale: 0.95 }}
                     className={`flex flex-col items-center justify-center py-4 px-2 rounded-2xl border-2 transition-all duration-300 cursor-pointer ${type === 'expense' ? 'bg-rose-500/10 border-rose-500 text-rose-600 shadow-lg' : 'bg-surface-container-lowest dark:bg-slate-800 border-outline-variant/30 text-on-surface-variant opacity-60'}`}
                     onClick={() => setType('expense')}
@@ -150,83 +122,43 @@ export function MobileInputClient({ accounts, categories, recentTransactions }: 
                     <span className="material-symbols-outlined mb-1 text-2xl" style={{ fontVariationSettings: type === 'expense' ? "'FILL' 1, 'wght' 600" : "'FILL' 0, 'wght' 400" }}>upload</span>
                     <span className="text-[10px] font-bold uppercase tracking-tighter">Keluar</span>
                 </motion.div>
-                <motion.div 
-                    whileTap={{ scale: 0.95 }}
-                    className={`flex flex-col items-center justify-center py-4 px-2 rounded-2xl border-2 transition-all duration-300 cursor-pointer ${type === 'kasbon' ? 'bg-blue-500/10 border-blue-500 text-blue-600 shadow-lg' : 'bg-surface-container-lowest dark:bg-slate-800 border-outline-variant/30 text-on-surface-variant opacity-60'}`}
-                    onClick={() => setType('kasbon')}
-                >
-                    <span className="material-symbols-outlined mb-1 text-2xl" style={{ fontVariationSettings: type === 'kasbon' ? "'FILL' 1, 'wght' 600" : "'FILL' 0, 'wght' 400" }}>account_balance_wallet</span>
-                    <span className="text-[10px] font-bold uppercase tracking-tighter">Kasbon</span>
-                </motion.div>
             </section>
 
             {/* Details Form Card */}
             <section className="glass-card p-6 rounded-[2.5rem] shadow-sm space-y-6">
                 <div className="space-y-5">
-                    {type === "kasbon" ? (
-                        <>
-                            <div className="space-y-1.5">
-                                <Label className="text-[11px] font-bold text-on-surface-variant uppercase ml-2">Nama Pengutang (Kasbon)</Label>
-                                <div className="relative group input-focus-ring">
-                                    <span className="material-symbols-outlined absolute left-4 top-3.5 text-on-surface-variant z-10 text-xl group-focus-within:text-primary transition-colors">person</span>
-                                    <Input 
-                                        placeholder="Cth: Pak Budi" 
-                                        value={debtorName} 
-                                        onChange={e => setDebtorName(e.target.value)} 
-                                        className="h-12 pl-12 rounded-2xl bg-surface-container-lowest dark:bg-slate-900 border-outline-variant/30 text-sm font-bold" 
-                                    />
-                                </div>
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-[11px] font-bold text-on-surface-variant uppercase ml-2">Kategori Bisnis</Label>
-                                <Select value={kasbonCategory} onValueChange={(v: any) => setKasbonCategory(v)}>
-                                    <SelectTrigger className="h-12 rounded-2xl bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/30 text-sm font-bold px-4 input-focus-ring">
-                                        <SelectValue placeholder="Pilih..." />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-2xl border-outline-variant/20">
-                                        <SelectItem value="kuota" className="rounded-xl">Kouta Internet</SelectItem>
-                                        <SelectItem value="voucher" className="rounded-xl">Voucher WiFi</SelectItem>
-                                        <SelectItem value="other" className="rounded-xl">Lain-lain</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="space-y-1.5">
-                                <Label className="text-[11px] font-bold text-on-surface-variant uppercase ml-2 flex items-center gap-1">Kategori <span className="text-[9px] font-normal italic opacity-60">(Filter otomatis)</span></Label>
-                                <Select value={categoryId} onValueChange={setCategoryId}>
-                                    <SelectTrigger className="h-12 rounded-2xl bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/30 text-sm font-bold px-4 input-focus-ring">
-                                        <SelectValue placeholder="Pilih Kategori..." />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-2xl border-outline-variant/20">
-                                        {filteredCategories.map(cat => (
-                                            <SelectItem key={cat.id} value={cat.id} className="rounded-xl">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="text-lg">{cat.icon}</span>
-                                                    <span>{cat.name}</span>
-                                                </div>
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                    <div className="space-y-1.5">
+                        <Label className="text-[11px] font-bold text-on-surface-variant uppercase ml-2 flex items-center gap-1">Kategori <span className="text-[9px] font-normal italic opacity-60">(Filter otomatis)</span></Label>
+                        <Select value={categoryId} onValueChange={setCategoryId}>
+                            <SelectTrigger className="h-12 rounded-2xl bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/30 text-sm font-bold px-4 input-focus-ring">
+                                <SelectValue placeholder="Pilih Kategori..." />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-2xl border-outline-variant/20">
+                                {filteredCategories.map(cat => (
+                                    <SelectItem key={cat.id} value={cat.id} className="rounded-xl">
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-lg">{cat.icon}</span>
+                                            <span>{cat.name}</span>
+                                        </div>
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
 
-                            <div className="space-y-1.5">
-                                <Label className="text-[11px] font-bold text-on-surface-variant uppercase ml-2">Sumber/Tujuan Dana</Label>
-                                <Select value={accountId} onValueChange={setAccountId}>
-                                    <SelectTrigger className="h-12 rounded-2xl bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/30 text-sm font-bold px-4 input-focus-ring">
-                                        <SelectValue placeholder="Pilih Akun..." />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-2xl border-outline-variant/20">
-                                        {accounts.map(acc => (
-                                            <SelectItem key={acc.id} value={acc.id} className="rounded-xl">{acc.name}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </>
-                    )}
+                    <div className="space-y-1.5">
+                        <Label className="text-[11px] font-bold text-on-surface-variant uppercase ml-2">Sumber/Tujuan Dana</Label>
+                        <Select value={accountId} onValueChange={setAccountId}>
+                            <SelectTrigger className="h-12 rounded-2xl bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant/30 text-sm font-bold px-4 input-focus-ring">
+                                <SelectValue placeholder="Pilih Akun..." />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-2xl border-outline-variant/20">
+                                {accounts.map(acc => (
+                                    <SelectItem key={acc.id} value={acc.id} className="rounded-xl">{acc.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                     {/* AI Quick Input */}
                     <div className="pt-1 space-y-2">
                         <Label className="text-[11px] font-bold text-on-surface-variant uppercase ml-2">AI Quick Input</Label>

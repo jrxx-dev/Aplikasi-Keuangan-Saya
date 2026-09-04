@@ -1,6 +1,5 @@
 import { MobileHeader } from "@/components/mobile/mobile-header";
 import { getFinancialSummary, getRecentTransactions, getAccounts, getBudgetSummary } from "@/lib/actions/finance";
-import { getBusinessData } from "@/actions/business";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import { BalanceCarousel } from "@/components/mobile/balance-carousel";
@@ -22,19 +21,16 @@ import {
     Plus,
     CheckCircle2,
     CalendarDays,
-    BadgeDollarSign,
-    UserCircle2,
-    ChevronRight
+    UserCircle2
 } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
 
 // Helper to get icon for category
-const getCategoryIcon = (category: string | null, type: 'income' | 'expense' | 'receivable') => {
+const getCategoryIcon = (category: string | null, type: 'income' | 'expense') => {
     const cat = category?.toLowerCase() || '';
     if (type === 'income') return ArrowDownLeft;
-    if (type === 'receivable') return BadgeDollarSign;
-    
+
     if (cat.includes('makan') || cat.includes('food') || cat.includes('kuliner')) return Utensils;
     if (cat.includes('belanja') || cat.includes('shop')) return ShoppingBag;
     if (cat.includes('transport') || cat.includes('ojek')) return Bus;
@@ -45,12 +41,11 @@ const getCategoryIcon = (category: string | null, type: 'income' | 'expense' | '
 
 async function DashboardData() {
     // Fetch data in parallel for speed
-    const [summary, recentTx, accounts, budgetSummary, businessData] = await Promise.all([
+    const [summary, recentTx, accounts, budgetSummary] = await Promise.all([
         getFinancialSummary(),
         getRecentTransactions(),
         getAccounts(),
-        getBudgetSummary(),
-        getBusinessData()
+        getBudgetSummary()
     ]);
 
     // Mapping real data to components
@@ -59,13 +54,9 @@ async function DashboardData() {
     const cashTotal = accounts.filter(a => a.type === 'cash').reduce((s, a) => s + parseFloat(a.balance), 0);
 
     // Calculate remaining budget
-    const totalRemainingBudget = budgetSummary?.totalBudget > 0 
-        ? Math.max(0, budgetSummary.totalBudget - budgetSummary.totalSpent) 
+    const totalRemainingBudget = budgetSummary?.totalBudget > 0
+        ? Math.max(0, budgetSummary.totalBudget - budgetSummary.totalSpent)
         : 0;
-
-    // Filter and sum Kasbon (receivables)
-    const activeKasbon = businessData?.debts.filter(d => d.type === 'receivable' && d.status === 'unpaid') || [];
-    const totalKasbon = activeKasbon.reduce((s, d) => s + parseFloat(d.amount), 0);
 
     return (
         <div className="flex flex-col gap-stack-lg">
@@ -87,36 +78,6 @@ async function DashboardData() {
                 </div>
                 <Link href="/budgets" className="text-primary text-[10px] uppercase font-black hover:underline active:scale-95 transition-transform duration-200 tracking-widest">DETAIL</Link>
             </div>
-
-            {/* Kasbon Bisnis Summary - NEW SECTION */}
-            {totalKasbon > 0 && (
-                <section className="animate-entrance delay-150">
-                    <Link href="/business?view=debt">
-                        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-5 text-white shadow-lg shadow-blue-500/20 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                                <BadgeDollarSign className="w-24 h-24" />
-                            </div>
-                            <div className="relative z-10 space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] opacity-80">Kasbon Bisnis Aktif</h3>
-                                        <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-black">{activeKasbon.length}</span>
-                                    </div>
-                                    <ChevronRight className="w-5 h-5 opacity-60 group-hover:translate-x-1 transition-transform" />
-                                </div>
-                                <div>
-                                    <p className="text-3xl font-black tabular-nums tracking-tight">
-                                        {formatCurrency(totalKasbon, true)}
-                                    </p>
-                                    <p className="text-[11px] font-medium opacity-70 mt-1">
-                                        Klik untuk detail atau kelola piutang
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </Link>
-                </section>
-            )}
 
             {/* Total Balance Card (Asset Grid) */}
             <AssetCards 

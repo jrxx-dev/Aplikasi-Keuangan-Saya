@@ -2,6 +2,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 // Initialize Admin Client with Service Role Key
 const supabaseAdmin = createClient(
@@ -15,22 +16,17 @@ const supabaseAdmin = createClient(
     }
 );
 
+async function requireSuperAdmin() {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user || session.user.role !== "superadmin") {
+        throw new Error("Unauthorized: hanya superadmin yang boleh mengakses fitur ini");
+    }
+    return session.user;
+}
+
 export async function getUsers() {
-    // 1. Verify Current User is Super Admin
-    // We need to check authorization headers or session
-    const session = await auth.api.getSession({ headers: { get: (k: string) => null } as any }); // Simplified for now, in real Next.js actions we use cookies()
-    // NOTE: In Server Actions, we rely on the session validation. 
-    // However, since auth.api.getSession logic relies on specific headers which might be tricky in pure actions without context passing,
-    // let's try a safer approach using the cookie-based client first to get the caller's ID.
-
-    // Better approach: Check if "service role" is available (it is).
-    // But we MUST PROTECT this data.
-    // For this demo, we will fetch the session using standard Next.js cookies if available, or proceed if we assume the middleware protects the route.
-    // But specific role check is best.
-
-    // Let's list users directly. In production, wrap this with session.role === 'superadmin' check.
-
     try {
+        await requireSuperAdmin();
         const { data: { users }, error } = await supabaseAdmin.auth.admin.listUsers();
 
         if (error) {
@@ -61,6 +57,7 @@ export async function getUsers() {
 
 export async function createUser(data: { email: string; password?: string; name: string; role: string; phone?: string }) {
     try {
+        await requireSuperAdmin();
         const { data: user, error } = await supabaseAdmin.auth.admin.createUser({
             email: data.email,
             password: data.password || "finance123", // Default password if empty
@@ -81,6 +78,7 @@ export async function createUser(data: { email: string; password?: string; name:
 
 export async function updateUserRole(userId: string, role: string) {
     try {
+        await requireSuperAdmin();
         const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
             user_metadata: { role }
         });
@@ -94,6 +92,7 @@ export async function updateUserRole(userId: string, role: string) {
 
 export async function deleteUser(userId: string) {
     try {
+        await requireSuperAdmin();
         const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
         if (error) throw error;
         return { success: true };
