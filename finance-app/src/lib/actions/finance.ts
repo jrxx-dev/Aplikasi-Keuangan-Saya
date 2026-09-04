@@ -586,6 +586,15 @@ export async function deleteAccount(accountId: string) {
     }
 
     try {
+        // Pastikan akun ini benar-benar milik user yang login sebelum menghapus apapun
+        const owned = await db.select({ id: accounts.id }).from(accounts)
+            .where(and(eq(accounts.id, accountId), eq(accounts.userId, session.user.id)))
+            .limit(1);
+
+        if (owned.length === 0) {
+            return { success: false, error: "Akun tidak ditemukan" };
+        }
+
         // Delete related transactions first to avoid FK constraints if cascade isn't set
         await db.delete(transactions).where(eq(transactions.accountId, accountId));
 
@@ -741,8 +750,8 @@ export async function createTransaction(data: {
                     source: data.source || "manual",
                 });
 
-            // 3. Update Account Balance
-            const account = await tx.select().from(accounts).where(eq(accounts.id, data.accountId)).limit(1);
+            // 3. Update Account Balance (akun harus milik user yang login)
+            const account = await tx.select().from(accounts).where(and(eq(accounts.id, data.accountId), eq(accounts.userId, session.user.id))).limit(1);
             if (!account || account.length === 0) throw new Error("Account not found");
 
             const currentBalance = Number(account[0].balance);
@@ -1069,8 +1078,13 @@ export async function handleAIAction(payload: {
 
     // 3. HANDLE DELETE (Bulk)
     if (payload.action === "delete") {
-        // Fetch transactions to restore balance
-        const txs = await db.select().from(transactions).where(inArray(transactions.id, targetIds));
+        // Fetch transactions to restore balance (hanya milik user yang login)
+        const txs = await db.select({ id: transactions.id, amount: transactions.amount, type: transactions.type, accountId: transactions.accountId })
+            .from(transactions)
+            .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+            .where(and(inArray(transactions.id, targetIds), eq(accounts.userId, session.user.id)));
+
+        const ownedIds = txs.map(t => t.id);
 
         for (const tx of txs) {
             const amount = parseFloat(tx.amount);
@@ -1085,10 +1099,12 @@ export async function handleAIAction(payload: {
             }
         }
 
-        await db.delete(transactions).where(inArray(transactions.id, targetIds));
+        if (ownedIds.length > 0) {
+            await db.delete(transactions).where(inArray(transactions.id, ownedIds));
+        }
         revalidatePath("/dashboard");
         revalidatePath("/transactions");
-        return { success: true, message: `${targetIds.length} transaksi berhasil dihapus dan saldo dikembalikan.` };
+        return { success: true, message: `${ownedIds.length} transaksi berhasil dihapus dan saldo dikembalikan.` };
     }
 
     // 4. HANDLE UPDATE (Bulk)
@@ -1101,8 +1117,13 @@ export async function handleAIAction(payload: {
             if (payload.data.type) updateData.type = payload.data.type;
             if (payload.data.date) updateData.date = new Date(payload.data.date);
 
-            // Fetch originals to adjust balance
-            const originalTxs = await db.select().from(transactions).where(inArray(transactions.id, targetIds));
+            // Fetch originals to adjust balance (hanya milik user yang login)
+            const originalTxs = await db.select({ id: transactions.id, amount: transactions.amount, type: transactions.type, accountId: transactions.accountId })
+                .from(transactions)
+                .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+                .where(and(inArray(transactions.id, targetIds), eq(accounts.userId, session.user.id)));
+
+            const ownedIds = originalTxs.map(t => t.id);
 
             for (const tx of originalTxs) {
                 // Only adjust balance if amount or type changed and we have valid account
@@ -1127,12 +1148,14 @@ export async function handleAIAction(payload: {
                 }
             }
 
-            await db.update(transactions)
-                .set(updateData)
-                .where(inArray(transactions.id, targetIds));
+            if (ownedIds.length > 0) {
+                await db.update(transactions)
+                    .set(updateData)
+                    .where(inArray(transactions.id, ownedIds));
+            }
 
             revalidatePath("/dashboard");
-            return { success: true, message: `${targetIds.length} transaksi berhasil diubah.` };
+            return { success: true, message: `${ownedIds.length} transaksi berhasil diubah.` };
         }
     }
 
@@ -1730,15 +1753,15 @@ export async function createSavingTransaction(data: {
 
     try {
         const result = await db.transaction(async (tx) => {
-            // 1. Get Goal (if provided)
+            // 1. Get Goal (if provided) — harus milik user yang login
             let goal: any[] = [];
             if (data.goalId) {
-                goal = await tx.select().from(goals).where(eq(goals.id, data.goalId)).limit(1);
+                goal = await tx.select().from(goals).where(and(eq(goals.id, data.goalId), eq(goals.userId, session.user.id))).limit(1);
                 if (goal.length === 0) throw new Error("Goal not found");
             }
 
-            // 2. Get Account
-            const account = await tx.select().from(accounts).where(eq(accounts.id, data.accountId)).limit(1);
+            // 2. Get Account — harus milik user yang login
+            const account = await tx.select().from(accounts).where(and(eq(accounts.id, data.accountId), eq(accounts.userId, session.user.id))).limit(1);
             if (account.length === 0) throw new Error("Account not found");
 
             // 3. Ensure "Tabungan" Category Exists

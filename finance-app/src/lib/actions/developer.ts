@@ -3,6 +3,16 @@
 import { db } from "@/db";
 import { sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+
+async function requireAdmin() {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user || session.user.role !== "superadmin") {
+        throw new Error("Unauthorized: hanya superadmin yang boleh mengakses fitur ini");
+    }
+    return session.user;
+}
 
 // Test Database Connection
 export async function testDatabaseConnection() {
@@ -120,6 +130,7 @@ export async function clearServerCache() {
 // Reset Database (Danger Zone)
 export async function resetDatabase() {
     try {
+        await requireAdmin();
         // Delete all user data (keep schema)
         await db.execute(sql`TRUNCATE TABLE transactions CASCADE`);
         await db.execute(sql`TRUNCATE TABLE accounts CASCADE`);
@@ -146,6 +157,7 @@ export async function resetDatabase() {
 // Clear User Data
 export async function clearUserData(userId: string) {
     try {
+        await requireAdmin();
         await db.execute(sql`
             DELETE FROM transactions WHERE user_id = ${userId}
         `);
