@@ -19,6 +19,7 @@ export async function testDatabaseConnection() {
     const startTime = Date.now();
 
     try {
+        await requireAdmin();
         await db.execute(sql`SELECT 1`);
         const latency = Date.now() - startTime;
 
@@ -40,6 +41,7 @@ export async function testDatabaseConnection() {
 // Test Auth API
 export async function testAuthAPI() {
     try {
+        await requireAdmin();
         // Simple auth check
         const result = await db.execute(sql`
             SELECT COUNT(*) as user_count 
@@ -65,6 +67,7 @@ export async function testAuthAPI() {
 // Health Check
 export async function performHealthCheck() {
     try {
+        await requireAdmin();
         const checks = [];
 
         // Database check
@@ -111,6 +114,7 @@ export async function performHealthCheck() {
 // Clear Server Cache
 export async function clearServerCache() {
     try {
+        await requireAdmin();
         // Revalidate all paths
         revalidatePath('/', 'layout');
 
@@ -189,6 +193,7 @@ export async function clearUserData(userId: string) {
 
 // Get Environment Info
 export async function getEnvironmentInfo() {
+    await requireAdmin();
     return {
         nodeEnv: process.env.NODE_ENV || 'development',
         nextVersion: '16.1.1',
@@ -202,6 +207,7 @@ export async function getEnvironmentInfo() {
 // Get Cache Stats
 export async function getCacheStats() {
     try {
+        await requireAdmin();
         // Get database cache stats
         const cacheResult = await db.execute(sql`
             SELECT 

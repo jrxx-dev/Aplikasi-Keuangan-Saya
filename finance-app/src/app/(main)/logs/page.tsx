@@ -15,6 +15,11 @@ export default async function ErrorLogsPage() {
         redirect("/");
     }
 
+    // Logs are app-wide and contain other users' IPs / financial metadata.
+    if (session.user.role !== "superadmin") {
+        redirect("/dashboard");
+    }
+
     // Fetch all logs from database (no limit)
     const { logs } = await getAllLogs();
 

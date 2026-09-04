@@ -5,7 +5,10 @@ import { eq } from "drizzle-orm";
 import { getAICompletion } from "@/lib/ai";
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET;
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Helper to send message to Telegram
 async function sendTelegramMessage(chatId: string, text: string) {
@@ -38,6 +41,16 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Bot token not configured" }, { status: 500 });
     }
 
+    // Reject anything that is not a genuine Telegram webhook delivery.
+    // Set the same value via setWebhook(secret_token=...).
+    if (!TELEGRAM_WEBHOOK_SECRET) {
+        console.error("TELEGRAM_WEBHOOK_SECRET not configured - rejecting webhook");
+        return NextResponse.json({ error: "Webhook not configured" }, { status: 503 });
+    }
+    if (req.headers.get("x-telegram-bot-api-secret-token") !== TELEGRAM_WEBHOOK_SECRET) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     try {
         const update = await req.json();
         console.log("📨 TELEGRAM UPDATE RECEIVED:", JSON.stringify(update, null, 2));
@@ -60,9 +73,31 @@ export async function POST(req: NextRequest) {
         if (text.startsWith("/start")) {
             const parts = text.split(" ");
             if (parts.length > 1) {
-                const userIdToPair = parts[1];
+                const userIdToPair = parts[1].trim();
 
-                // Save chatId to database
+                if (!UUID_RE.test(userIdToPair)) {
+                    await sendTelegramMessage(chatId, "🔒 Kode pairing tidak valid. Buka menu Settings di FinanceMy dan klik tombol Connect Telegram.");
+                    return NextResponse.json({ ok: true });
+                }
+
+                // Refuse to hijack an account that is already linked to a different chat.
+                const existing = await db.query.userSettings.findFirst({
+                    where: eq(userSettings.userId, userIdToPair)
+                });
+                if (existing?.telegramChatId && existing.telegramChatId !== chatId) {
+                    await sendTelegramMessage(chatId, "🔒 Akun ini sudah terhubung ke Telegram lain. Putuskan dulu dari menu Settings di aplikasi.");
+                    return NextResponse.json({ ok: true });
+                }
+
+                // Also make sure this chat is not already bound to another account.
+                const chatOwner = await db.query.userSettings.findFirst({
+                    where: eq(userSettings.telegramChatId, chatId)
+                });
+                if (chatOwner && chatOwner.userId !== userIdToPair) {
+                    await sendTelegramMessage(chatId, "🔒 Telegram ini masih terhubung ke akun lain. Putuskan dulu dari aplikasi.");
+                    return NextResponse.json({ ok: true });
+                }
+
                 await db.insert(userSettings).values({
                     userId: userIdToPair,
                     telegramChatId: chatId,
